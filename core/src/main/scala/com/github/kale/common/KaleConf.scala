@@ -19,4 +19,11 @@ package com.github.kale.common
 
 object KaleConf {
 
+  import org.apache.spark.sql.internal.SQLConf.buildStaticConf
+
+  val KALE_EXTENSION_ENABLE = buildStaticConf("spark.kale.limit.enable")
+    .doc("Indicate to whether kale extension enable")
+    .version("1.0.0")
+    .booleanConf
+    .createWithDefault(true)
 }

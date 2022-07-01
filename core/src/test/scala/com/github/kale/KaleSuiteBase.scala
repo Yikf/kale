@@ -19,10 +19,11 @@ package com.github.kale
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.SparkSession
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Suite}
 
 // Kale suite base
-trait KaleSuiteBase extends BeforeAndAfterAll with BeforeAndAfter with Logging {
+trait KaleSuiteBase extends AnyFunSuite with BeforeAndAfterAll with BeforeAndAfter with Logging {
   self: Suite =>
 
   var spark: SparkSession = _

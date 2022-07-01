@@ -15,18 +15,25 @@
  * limitations under the License.
  */
 
-package com.github.kale
+package com.github.kale.optimizer
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion}
-import com.github.kale.optimizer.RepartitionSmallFile
-import org.apache.spark.sql.SparkSessionExtensions
+import com.github.kale.{KaleSparkExtension, KaleSuiteBase}
+import org.apache.spark.sql.catalyst.plans.physical.SinglePartition
+import org.apache.spark.sql.execution.exchange.Exchange
 
-class KaleSparkExtension extends Extension {
+class RepartitionSmallFiles extends KaleSuiteBase {
 
-  override def apply(extension: SparkSessionExtensions): Unit = {
-    extension.injectFunction(KaleVersion.functionDescribe)
-    extension.injectFunction(KalePrefixExpression.kalePrefix)
+  test("Repartition small files ") {
+    withSQLConf(
+      ("spark.sql.extensions", classOf[KaleSparkExtension].getCanonicalName),
+      ("spark.sql.adaptive.enabled", "false")) {
+      val frame = spark.sql("select * from values('1'),('2')")
 
-    extension.injectOptimizerRule(_ => RepartitionSmallFile())
+      val plan = frame.queryExecution.executedPlan
+      assert(plan.isInstanceOf[Exchange])
+      assert(plan.outputPartitioning == SinglePartition)
+      assert(plan.execute().partitions.length == 1)
+
+    }
   }
 }
