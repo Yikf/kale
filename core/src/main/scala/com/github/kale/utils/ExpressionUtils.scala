@@ -15,15 +15,20 @@
  * limitations under the License.
  */
 
-package com.github.kale
+package com.github.kale.utils
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion}
-import org.apache.spark.sql.SparkSessionExtensions
+import org.apache.spark.sql.catalyst.expressions.{ExpressionDescription, ExpressionInfo}
 
-class KaleSparkExtension extends Extension {
+object ExpressionUtils {
 
-  override def apply(extension: SparkSessionExtensions): Unit = {
-    extension.injectFunction(KaleVersion.functionDescribe)
-    extension.injectFunction(KalePrefixExpression.kalePrefix)
+  def buildExpressionInfo[T](fun: Class[T]): ExpressionInfo = {
+    val description = fun.getAnnotation(classOf[ExpressionDescription])
+
+    if (null != description) {
+      new ExpressionInfo(fun.getCanonicalName, description.source())
+    } else {
+      new ExpressionInfo(fun.getCanonicalName, "")
+    }
   }
+
 }

@@ -17,13 +17,34 @@
 
 package com.github.kale
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion}
-import org.apache.spark.sql.SparkSessionExtensions
+import org.apache.spark.internal.Logging
+import org.apache.spark.sql.SparkSession
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Suite}
 
-class KaleSparkExtension extends Extension {
+// Kale suite base
+trait KaleSuiteBase extends BeforeAndAfterAll with BeforeAndAfter with Logging {
+  self: Suite =>
 
-  override def apply(extension: SparkSessionExtensions): Unit = {
-    extension.injectFunction(KaleVersion.functionDescribe)
-    extension.injectFunction(KalePrefixExpression.kalePrefix)
+  val spark: SparkSession
+
+  before {
+
   }
+
+  after {
+
+  }
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+  }
+
+  override def afterAll(): Unit = {
+
+  }
+
+  def withSQLConf(): Unit = {
+
+  }
+
 }

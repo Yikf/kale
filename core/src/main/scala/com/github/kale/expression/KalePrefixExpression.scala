@@ -17,45 +17,44 @@
 
 package com.github.kale.expression
 
-import com.github.kale.KALE_VERSION
 import com.github.kale.utils.ExpressionUtils
 import org.apache.spark.sql.catalyst.{FunctionIdentifier, InternalRow}
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, LeafExpression}
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
+import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, UnaryExpression}
 import org.apache.spark.sql.types.{DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 
 // scalastyle:off line.size.limit
 @ExpressionDescription(
-  usage = """_FUNC_() - Returns the Kale version. The string contains 2 fields, the first being a release version and the second being a git revision.""",
+  usage = """_FUNC_() - return string with kale prefix.""",
   examples = """
     Examples:
-      > SELECT _FUNC_();
-       3.1.0 a6d6ea3efedbad14d99c24143834cd4e2e52fb40
+      > SELECT _FUNC_(col);
+       kale-col
   """,
   since = "3.0.0",
   group = "extension_func",
-  source = "kale_version")
+  source = "kale_prefix")
 // scalastyle:on line.size.limit
-case class KaleVersion() extends LeafExpression with CodegenFallback {
-
-  override def nullable: Boolean = false
-
-  override def foldable: Boolean = true
+case class KalePrefixExpression(child: Expression) extends UnaryExpression
+    with CodegenFallback {
 
   override def dataType: DataType = StringType
 
-  override def prettyName: String = "kale-version"
+  override protected def withNewChildInternal(newChild: Expression): Expression = this.copy(child = newChild)
 
   override def eval(input: InternalRow): Any = {
-    UTF8String.fromString(KALE_VERSION)
+    val srcString = child.eval(input).asInstanceOf[UTF8String]
+    UTF8String.fromString(s"kale-$srcString")
   }
+
+  override def prettyName: String = "kale-prefix"
 }
 
-object KaleVersion {
-  val functionDescribe = (
-    new FunctionIdentifier("kale_version"),
-    ExpressionUtils.buildExpressionInfo(classOf[KaleVersion]),
-    (_: Seq[Expression]) => KaleVersion()
+object KalePrefixExpression {
+  val kalePrefix = (
+    FunctionIdentifier("kale_prefix"),
+    ExpressionUtils.buildExpressionInfo[KalePrefixExpression](classOf[KalePrefixExpression]),
+    (c: Seq[Expression]) => KalePrefixExpression(c.head)
   )
 }
