@@ -17,32 +17,24 @@
 
 package com.github.kale.expression
 
-import com.github.kale.KaleSparkExtension
-import org.apache.spark.sql.SparkSession
+import com.github.kale.{KaleSparkExtension, KaleSuiteBase}
 import org.scalatest.funsuite.AnyFunSuite
 
 // TODO Stripping out the spark
-class KaleVersionSuite extends AnyFunSuite {
+class KaleVersionSuite extends AnyFunSuite with KaleSuiteBase {
   test("kaleVersion expression") {
     val version = KaleVersion().eval()
     assert(version.toString == "1.0-SNAPSHOT")
   }
 
   test("KaleVersion with spark sql extension") {
-    val session = SparkSession.builder()
-      .withExtensions(new KaleSparkExtension)
-      .master("local")
-      .appName("kale_version")
-      .getOrCreate()
-    session.sql("select kale_version() as a").show()
+    withSQLConf(("spark.sql.extensions", classOf[KaleSparkExtension].getCanonicalName)) {
+      spark.sql("select kale_version() as a").show()
+    }
+
   }
 
   test("KaleVersion with spark sql extension22") {
-    val session = SparkSession.builder()
-      .withExtensions(new KaleSparkExtension)
-      .master("local")
-      .appName("kale_version")
-      .getOrCreate()
-    session.sql("select kale_prefix(col1) from values('1'),('2'),('3')").show()
+    spark.sql("select kale_prefix(col1) from values('1'),('2'),('3')").show()
   }
 }

@@ -17,8 +17,6 @@
 
 package com.github.kale.plugin
 
-import com.github.kale.{KaleSparkExtension, KaleSparkPlugin}
-import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
 
 class KaleDriverPluginSuite extends AnyFunSuite {

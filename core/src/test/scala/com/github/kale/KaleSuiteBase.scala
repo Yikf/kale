@@ -25,26 +25,40 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Suite}
 trait KaleSuiteBase extends BeforeAndAfterAll with BeforeAndAfter with Logging {
   self: Suite =>
 
-  val spark: SparkSession
+  var spark: SparkSession = _
 
   before {
-
+    spark = SparkSession.builder()
+      .appName(this.getClass.getCanonicalName)
+      .master("local[*]")
+      .getOrCreate()
   }
 
   after {
-
+    if (null != spark) {
+      spark.close()
+    }
   }
 
   override def beforeAll(): Unit = {
-    super.beforeAll()
+
   }
 
   override def afterAll(): Unit = {
 
   }
 
-  def withSQLConf(): Unit = {
+  def withSQLConf[R](config: (String, String)*)(f: => R): R = {
+    if (null != spark) spark.close()
+    val configBuilder = SparkSession.builder()
+      .appName(this.getClass.getCanonicalName)
+      .master("local[*]")
+    config.foreach{
+      case (k, v) => configBuilder.config(k, v)
+    }
 
+    spark = configBuilder.getOrCreate()
+    f
   }
 
 }
