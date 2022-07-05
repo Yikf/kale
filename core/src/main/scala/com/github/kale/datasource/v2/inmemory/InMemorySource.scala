@@ -15,21 +15,25 @@
  * limitations under the License.
  */
 
-package com.github.kale
+package com.github.kale.datasource.v2.inmemory
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion}
-import com.github.kale.optimizer.RepartitionSmallFile
-import com.github.kale.parser.KaleParser
-import org.apache.spark.sql.SparkSessionExtensions
+import org.apache.spark.sql.connector.catalog.{Table, TableProvider}
+import org.apache.spark.sql.connector.expressions.Transform
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-class KaleSparkExtension extends Extension {
+import java.util
 
-  override def apply(extension: SparkSessionExtensions): Unit = {
-    extension.injectFunction(KaleVersion.functionDescribe)
-    extension.injectFunction(KalePrefixExpression.kalePrefix)
+/**
+ * A Spark datasource based on v2 and which data persist on memory.
+ */
+class InMemorySource extends TableProvider {
 
-    extension.injectParser((_, parser) => KaleParser(parser))
+  override def inferSchema(options: CaseInsensitiveStringMap): StructType = {
+    throw new UnsupportedOperationException("InMemory table don't supported infer table. ")
+  }
 
-    extension.injectOptimizerRule(_ => RepartitionSmallFile())
+  override def getTable(schema: StructType, partitioning: Array[Transform], properties: util.Map[String, String]): Table = {
+    InMemoryTable(schema, properties)
   }
 }

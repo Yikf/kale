@@ -15,21 +15,15 @@
  * limitations under the License.
  */
 
-package com.github.kale
+package com.github.kale.datasource.v2.inmemory
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion}
-import com.github.kale.optimizer.RepartitionSmallFile
-import com.github.kale.parser.KaleParser
-import org.apache.spark.sql.SparkSessionExtensions
+import com.github.kale.KaleSuiteBase
 
-class KaleSparkExtension extends Extension {
+class InMemoryScanSuite extends KaleSuiteBase {
+  test("create table") {
+    spark.sql(s"create table t1 (id string) using ${classOf[InMemorySource].getCanonicalName}").show()
 
-  override def apply(extension: SparkSessionExtensions): Unit = {
-    extension.injectFunction(KaleVersion.functionDescribe)
-    extension.injectFunction(KalePrefixExpression.kalePrefix)
-
-    extension.injectParser((_, parser) => KaleParser(parser))
-
-    extension.injectOptimizerRule(_ => RepartitionSmallFile())
+    spark.sql("select * from t1").show(false)
   }
+
 }
