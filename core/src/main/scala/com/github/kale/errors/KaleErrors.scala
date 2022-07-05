@@ -27,4 +27,8 @@ object KaleErrors {
     throw new KaleException("Error closing kale build info resource stream", e)
   }
 
+  def kaleNotSupportOperator(op: String): Exception = {
+    new UnsupportedOperationException(s"Kale not support operator [$op]")
+  }
+
 }
