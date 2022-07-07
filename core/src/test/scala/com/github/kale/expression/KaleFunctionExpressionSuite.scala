@@ -20,10 +20,14 @@ package com.github.kale.expression
 import com.github.kale.KaleSuiteBase
 
 // TODO Stripping out the spark
-class KaleVersionSuite extends KaleSuiteBase {
+class KaleFunctionExpressionSuite extends KaleSuiteBase {
 
   test("kaleVersion expression") {
     val version = KaleVersion().eval()
     assert(version.toString == "1.0-SNAPSHOT")
+  }
+
+  test("Url encode") {
+    spark.sql("explain extended select  * from values(1)").show(false)
   }
 }

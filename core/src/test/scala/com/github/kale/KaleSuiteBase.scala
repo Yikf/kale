@@ -31,6 +31,7 @@ trait KaleSuiteBase extends AnyFunSuite with BeforeAndAfterAll with BeforeAndAft
   before {
     spark = SparkSession.builder()
       .appName(this.getClass.getCanonicalName)
+      .withExtensions(new KaleSparkExtension)
       .master("local[*]")
       .getOrCreate()
   }

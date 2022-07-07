@@ -52,7 +52,8 @@ class KaleCatalog extends TableCatalog with Logging {
   override def createTable(ident: Identifier,
       schema: StructType, partitions: Array[Transform], properties: util.Map[String, String]): Table = {
     // TODO convert to Table
-    cacheTable += (ident, null)
+    cacheTable += (ident -> null)
+    null
   }
 
   override def alterTable(ident: Identifier, changes: TableChange*): Table = {

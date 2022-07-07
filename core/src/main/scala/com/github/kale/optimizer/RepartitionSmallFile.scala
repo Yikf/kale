@@ -22,6 +22,7 @@ import com.github.kale.optimizer.RepartitionSmallFile.repartitionSmallFile_tag
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Repartition}
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.catalyst.trees.TreeNodeTag
+import org.apache.spark.sql.execution.command.ExplainCommand
 
 case class RepartitionSmallFile() extends Rule[LogicalPlan] {
   override def apply(plan: LogicalPlan): LogicalPlan = {
@@ -31,7 +32,10 @@ case class RepartitionSmallFile() extends Rule[LogicalPlan] {
     }
 
     plan match {
+      case e@ExplainCommand(logicalPlan, _) => e.copy(logicalPlan = apply(logicalPlan))
+
       case r: Repartition if r.getTagValue(repartitionSmallFile_tag).get.equals("true") => r
+
       case plan =>
         val planWithRepartition = Repartition(1, shuffle = true, plan)
         planWithRepartition.setTagValue(repartitionSmallFile_tag, "true")
