@@ -18,6 +18,7 @@
 package com.github.kale.optimizer
 
 import com.github.kale.common.KaleConf
+import com.github.kale.common.KaleConf.KALE_REPARTITION_FILES
 import com.github.kale.optimizer.RepartitionSmallFile.repartitionSmallFile_tag
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Repartition}
 import org.apache.spark.sql.catalyst.rules.Rule
@@ -27,7 +28,7 @@ import org.apache.spark.sql.execution.command.ExplainCommand
 case class RepartitionSmallFile() extends Rule[LogicalPlan] {
   override def apply(plan: LogicalPlan): LogicalPlan = {
 
-    if (!conf.getConf(KaleConf.KALE_EXTENSION_ENABLE)) {
+    if (!conf.getConf(KaleConf.KALE_REPARTITION_SMALL_FILES_ENABLE)) {
       return plan
     }
 
@@ -37,7 +38,11 @@ case class RepartitionSmallFile() extends Rule[LogicalPlan] {
       case r: Repartition if r.getTagValue(repartitionSmallFile_tag).get.equals("true") => r
 
       case plan =>
-        val planWithRepartition = Repartition(1, shuffle = true, plan)
+        val planWithRepartition = Repartition(
+          conf.getConf(KALE_REPARTITION_FILES),
+          shuffle = true,
+          plan)
+        
         planWithRepartition.setTagValue(repartitionSmallFile_tag, "true")
         planWithRepartition
 
