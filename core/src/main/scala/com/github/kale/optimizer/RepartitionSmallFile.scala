@@ -33,7 +33,7 @@ case class RepartitionSmallFile() extends Rule[LogicalPlan] {
     }
 
     plan match {
-      case e@ExplainCommand(logicalPlan, _) => e.copy(logicalPlan = apply(logicalPlan))
+      case e @ExplainCommand(logicalPlan, _) => e.copy(logicalPlan = apply(logicalPlan))
 
       case r: Repartition if r.getTagValue(repartitionSmallFile_tag).get.equals("true") => r
 
@@ -42,7 +42,7 @@ case class RepartitionSmallFile() extends Rule[LogicalPlan] {
           conf.getConf(KALE_REPARTITION_FILES),
           shuffle = true,
           plan)
-        
+
         planWithRepartition.setTagValue(repartitionSmallFile_tag, "true")
         planWithRepartition
 

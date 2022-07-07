@@ -24,7 +24,7 @@ import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.types.{DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 
-import java.net.URLEncoder
+import java.net.URLDecoder
 
 // scalastyle:off line.size.limit
 @ExpressionDescription(
@@ -38,26 +38,24 @@ import java.net.URLEncoder
   group = "extension_func",
   source = "kale_version")
 // scalastyle:on line.size.limit
-case class UrlEncode(child: Expression) extends UnaryExpression with CodegenFallback {
-
-  override def nullable: Boolean = child.nullable
-
-  override def eval(input: InternalRow): Any = {
-    val string = child.eval(input).asInstanceOf[UTF8String]
-    UTF8String.fromString(URLEncoder.encode(string.toString, "UTF-8"))
-  }
+case class UrlDecode(child: Expression) extends UnaryExpression with CodegenFallback {
 
   override def dataType: DataType = StringType
 
-  override def prettyName: String = "url_encode"
+  override def nullable: Boolean = child.nullable
 
   override protected def withNewChildInternal(newChild: Expression): Expression = this.copy(child = newChild)
+
+  override def eval(input: InternalRow): Any = {
+    val value = child.eval(input).asInstanceOf[UTF8String]
+    UTF8String.fromString(URLDecoder.decode(value.toString, "UTF-8"))
+  }
 }
 
-object UrlEncode {
+object UrlDecode {
   val functionDescribe = (
-    new FunctionIdentifier("url_encode"),
-    ExpressionUtils.buildExpressionInfo(classOf[UrlEncode]),
-    (c: Seq[Expression]) => UrlEncode(c.head)
+    new FunctionIdentifier("url_decode"),
+    ExpressionUtils.buildExpressionInfo(classOf[UrlDecode]),
+    (c: Seq[Expression]) => UrlDecode(c.head)
   )
 }

@@ -63,4 +63,8 @@ trait KaleSuiteBase extends AnyFunSuite with BeforeAndAfterAll with BeforeAndAft
     f
   }
 
+  def checkAnswer(excepted: Any)(f: Unit => Any): Boolean = {
+    f == excepted
+  }
+
 }

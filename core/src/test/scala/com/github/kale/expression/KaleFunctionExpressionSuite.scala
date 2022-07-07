@@ -18,6 +18,7 @@
 package com.github.kale.expression
 
 import com.github.kale.KaleSuiteBase
+import org.apache.spark.sql.Row
 
 // TODO Stripping out the spark
 class KaleFunctionExpressionSuite extends KaleSuiteBase {
@@ -27,7 +28,16 @@ class KaleFunctionExpressionSuite extends KaleSuiteBase {
     assert(version.toString == "1.0-SNAPSHOT")
   }
 
-  test("Url encode") {
-    spark.sql("explain extended select  * from values(1)").show(false)
+  test("Url decode & encode") {
+    val url = "https://github.com/Yikf"
+    val encodeUrl = "https%3A%2F%2Fgithub.com%2FYikf"
+
+    checkAnswer(Row(encodeUrl)){ _ =>
+      spark.sql(s"select url_encode('$url')").collect().head
+    }
+
+    checkAnswer(Row(url)){ _ =>
+      spark.sql(s"select url_decode('$encodeUrl')").collect().head
+    }
   }
 }

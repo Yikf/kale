@@ -17,7 +17,7 @@
 
 package com.github.kale
 
-import com.github.kale.expression.{KalePrefixExpression, KaleVersion, UrlEncode}
+import com.github.kale.expression.{KalePrefixExpression, KaleVersion, UrlDecode, UrlEncode}
 import com.github.kale.optimizer.RepartitionSmallFile
 import com.github.kale.parser.KaleParser
 import org.apache.spark.sql.SparkSessionExtensions
@@ -28,6 +28,7 @@ class KaleSparkExtension extends Extension {
     extension.injectFunction(KaleVersion.functionDescribe)
     extension.injectFunction(KalePrefixExpression.kalePrefix)
     extension.injectFunction(UrlEncode.functionDescribe)
+    extension.injectFunction(UrlDecode.functionDescribe)
 
     extension.injectParser((_, parser) => KaleParser(parser))
 
