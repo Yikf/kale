@@ -19,6 +19,7 @@ package com.github.kale.datasource.v2.inmemory
 
 import org.apache.spark.sql.connector.catalog.{Table, TableProvider}
 import org.apache.spark.sql.connector.expressions.Transform
+import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
@@ -27,7 +28,7 @@ import java.util
 /**
  * A Spark datasource based on v2 and which data persist on memory.
  */
-class InMemorySource extends TableProvider {
+class InMemorySource extends TableProvider with DataSourceRegister {
 
   override def inferSchema(options: CaseInsensitiveStringMap): StructType = {
     throw new UnsupportedOperationException("InMemory table don't supported infer table. ")
@@ -36,4 +37,6 @@ class InMemorySource extends TableProvider {
   override def getTable(schema: StructType, partitioning: Array[Transform], properties: util.Map[String, String]): Table = {
     InMemoryTable(schema, properties)
   }
+
+  override def shortName(): String = "kaleV2"
 }

@@ -17,6 +17,15 @@
 
 package org.apache.spark.benchmark
 
-object SeqArrayBufferBenchmark extends App {
+object SeqArrayBufferBenchmark {
   // new Benchmark()
+
+  def main(args: Array[String]): Unit = {
+    throwMethod()
+  }
+
+  @throws[RuntimeException]("Don't worry me.")
+  def throwMethod(): Unit = {
+
+  }
 }
