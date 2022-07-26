@@ -18,7 +18,7 @@
 package com.github.kale
 
 import com.github.kale.expression.{KalePrefixExpression, KaleVersion, UrlDecode, UrlEncode}
-import com.github.kale.optimizer.RepartitionSmallFile
+import com.github.kale.optimizer.{RepartitionSmallFile, SimplifyConflictBinaryComparison}
 import com.github.kale.parser.KaleParser
 import org.apache.spark.sql.SparkSessionExtensions
 
@@ -33,5 +33,6 @@ class KaleSparkExtension extends Extension {
     extension.injectParser((_, parser) => KaleParser(parser))
 
     extension.injectOptimizerRule(_ => RepartitionSmallFile())
+    extension.injectOptimizerRule(_ => SimplifyConflictBinaryComparison())
   }
 }
